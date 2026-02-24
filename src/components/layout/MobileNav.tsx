@@ -3,14 +3,14 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
-import { LayoutDashboard, BookOpen, BarChart3, ShieldAlert, Trophy } from 'lucide-react'
+import { LayoutDashboard, BookOpen, Banknote, Settings, BarChart3 } from 'lucide-react'
 
 const mobileNav = [
-  { href: '/dashboard',  label: 'Home',      icon: LayoutDashboard },
-  { href: '/bets',       label: 'Bets',      icon: BookOpen },
-  { href: '/analytics',  label: 'Analytics', icon: BarChart3 },
-  { href: '/risk',       label: 'Risk',      icon: ShieldAlert },
-  { href: '/rankings',   label: 'Rankings',  icon: Trophy },
+  { href: '/dashboard',   label: 'Home',        icon: LayoutDashboard },
+  { href: '/bets',        label: 'Bets',        icon: BookOpen },
+  { href: '/analytics',   label: 'Analytics',   icon: BarChart3 },
+  { href: '/withdrawals', label: 'Withdrawals',  icon: Banknote },
+  { href: '/settings',    label: 'Settings',    icon: Settings },
 ]
 
 export function MobileNav() {
