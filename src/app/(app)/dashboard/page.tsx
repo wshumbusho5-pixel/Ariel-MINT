@@ -138,7 +138,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Bankroll chart */}
-      <BankrollChart snapshots={snapshots} currentBankroll={profile?.current_bankroll ?? 0} />
+      <BankrollChart snapshots={snapshots} currentBankroll={profile?.current_bankroll ?? 0} currency={profile?.currency} />
 
       {/* Pending bets + Recent bets */}
       <div className="grid lg:grid-cols-2 gap-6">

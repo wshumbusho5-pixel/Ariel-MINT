@@ -13,9 +13,10 @@ interface Snapshot {
 interface BankrollChartProps {
   snapshots: Snapshot[]
   currentBankroll: number
+  currency?: string
 }
 
-export function BankrollChart({ snapshots, currentBankroll }: BankrollChartProps) {
+export function BankrollChart({ snapshots, currentBankroll, currency = 'USD' }: BankrollChartProps) {
   const data = snapshots.map(s => ({
     date: new Date(s.snapshot_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
     bankroll: s.bankroll,
@@ -62,14 +63,14 @@ export function BankrollChart({ snapshots, currentBankroll }: BankrollChartProps
                 tick={{ fill: '#64748b', fontSize: 11 }}
                 axisLine={false}
                 tickLine={false}
-                tickFormatter={(v) => `$${v.toLocaleString()}`}
-                width={70}
+                tickFormatter={(v) => formatCurrency(v, currency)}
+                width={80}
               />
               <Tooltip
                 contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '8px' }}
                 labelStyle={{ color: '#94a3b8' }}
                 itemStyle={{ color: isPositiveTrend ? '#10b981' : '#ef4444' }}
-                formatter={(value) => [formatCurrency(value as number), 'Bankroll']}
+                formatter={(value) => [formatCurrency(value as number, currency), 'Bankroll']}
               />
               <Area
                 type="monotone"

@@ -117,7 +117,7 @@ export function SettingsForm({
                 className="bg-slate-800 border-slate-700 text-slate-200"
               />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <Label className="text-slate-300 text-xs">Currency</Label>
                 <SearchableSelect
@@ -161,9 +161,9 @@ export function SettingsForm({
         </CardHeader>
         <CardContent className="px-5 pb-5">
           <form onSubmit={saveSettings} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label className="text-slate-300 text-xs">Withdrawal Target ($)</Label>
+                <Label className="text-slate-300 text-xs">Withdrawal Target ({currency})</Label>
                 <Input type="number" name="withdrawal_target" defaultValue={settings?.withdrawal_target ?? ''} placeholder="500" className="bg-slate-800 border-slate-700 text-slate-200" />
                 <p className="text-xs text-slate-500">Alert when profit reaches this amount</p>
               </div>
@@ -173,14 +173,14 @@ export function SettingsForm({
                 <p className="text-xs text-slate-500">Consecutive losses to suggest a break</p>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <Label className="text-slate-300 text-xs">Drawdown Alert (%)</Label>
                 <Input type="number" name="break_on_drawdown_pct" defaultValue={settings?.break_on_drawdown_pct ?? 20} className="bg-slate-800 border-slate-700 text-slate-200" />
                 <p className="text-xs text-slate-500">Alert when bankroll drops this % from peak</p>
               </div>
               <div className="space-y-1.5">
-                <Label className="text-slate-300 text-xs">Daily Loss Limit ($)</Label>
+                <Label className="text-slate-300 text-xs">Daily Loss Limit ({currency})</Label>
                 <Input type="number" name="daily_loss_limit" defaultValue={settings?.daily_loss_limit ?? ''} placeholder="Optional" className="bg-slate-800 border-slate-700 text-slate-200" />
               </div>
             </div>

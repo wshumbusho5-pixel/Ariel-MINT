@@ -8,6 +8,7 @@ import { toast } from 'sonner'
 import { betSchema, type BetFormData } from '@/lib/validations/bet.schema'
 import type { z } from 'zod'
 import { parseOdds } from '@/lib/utils/odds'
+import { formatCurrency } from '@/lib/utils/currency'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -27,9 +28,10 @@ interface BetFormProps {
   prefill?: ParsedBetFields
   ocrJobId?: string
   editBetId?: string
+  currency?: string
 }
 
-export function BetForm({ prefill, ocrJobId, editBetId }: BetFormProps) {
+export function BetForm({ prefill, ocrJobId, editBetId, currency = 'USD' }: BetFormProps) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [oddsInput, setOddsInput] = useState(prefill?.odds?.toString() ?? '')
@@ -116,7 +118,7 @@ export function BetForm({ prefill, ocrJobId, editBetId }: BetFormProps) {
         <CardContent className="pt-5 space-y-4">
           <h3 className="text-sm font-semibold text-slate-300 uppercase tracking-wide">Event Details</h3>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <Label className="text-slate-300 text-xs">Sport *</Label>
               <Select onValueChange={(v) => setValue('sport', v)} defaultValue={prefill?.sport}>
@@ -152,7 +154,7 @@ export function BetForm({ prefill, ocrJobId, editBetId }: BetFormProps) {
             {errors.event_name && <p className="text-xs text-red-400">{errors.event_name.message}</p>}
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <Label className="text-slate-300 text-xs">Market *</Label>
               <Select onValueChange={(v) => setValue('market', v)} defaultValue={prefill?.market}>
@@ -196,7 +198,7 @@ export function BetForm({ prefill, ocrJobId, editBetId }: BetFormProps) {
         <CardContent className="pt-5 space-y-4">
           <h3 className="text-sm font-semibold text-slate-300 uppercase tracking-wide">Bet Details</h3>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <Label className="text-slate-300 text-xs">Bookmaker *</Label>
               <Select onValueChange={(v) => setValue('bookmaker', v)} defaultValue={prefill?.bookmaker}>
@@ -227,7 +229,7 @@ export function BetForm({ prefill, ocrJobId, editBetId }: BetFormProps) {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <Label className="text-slate-300 text-xs">
                 Odds *
@@ -249,7 +251,7 @@ export function BetForm({ prefill, ocrJobId, editBetId }: BetFormProps) {
             </div>
 
             <div className="space-y-1.5">
-              <Label className="text-slate-300 text-xs">Stake ($) *</Label>
+              <Label className="text-slate-300 text-xs">Stake ({currency}) *</Label>
               <Input
                 type="number"
                 step="0.01"
@@ -264,14 +266,14 @@ export function BetForm({ prefill, ocrJobId, editBetId }: BetFormProps) {
               />
               {potentialPayout !== null && (
                 <p className="text-xs text-emerald-400">
-                  Potential return: ${potentialPayout.toFixed(2)}
+                  Potential return: {formatCurrency(potentialPayout, currency)}
                 </p>
               )}
               {errors.stake && <p className="text-xs text-red-400">{errors.stake.message}</p>}
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <Label className="text-slate-300 text-xs">Confidence (1–5)</Label>
               <div className="flex gap-2">

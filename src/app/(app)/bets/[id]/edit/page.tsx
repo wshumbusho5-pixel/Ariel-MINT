@@ -17,13 +17,16 @@ export default async function EditBetPage({
 
   const { id } = await params
 
-  const { data: bet } = await supabase
-    .from('bets')
-    .select('*')
-    .eq('id', id)
-    .eq('user_id', user.id)
-    .is('deleted_at', null)
-    .single()
+  const [{ data: bet }, { data: profile }] = await Promise.all([
+    supabase
+      .from('bets')
+      .select('*')
+      .eq('id', id)
+      .eq('user_id', user.id)
+      .is('deleted_at', null)
+      .single(),
+    supabase.from('profiles').select('currency').eq('id', user.id).single(),
+  ])
 
   if (!bet) notFound()
 
@@ -74,7 +77,7 @@ export default async function EditBetPage({
         </Link>
         <h1 className="text-lg font-bold text-white">Edit Bet</h1>
       </div>
-      <BetForm prefill={prefill} editBetId={id} />
+      <BetForm prefill={prefill} editBetId={id} currency={profile?.currency ?? 'USD'} />
     </div>
   )
 }

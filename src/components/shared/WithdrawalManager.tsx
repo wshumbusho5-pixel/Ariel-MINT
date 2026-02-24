@@ -92,7 +92,7 @@ export function WithdrawalManager({
           {showForm && (
             <div className="p-4 bg-slate-800 rounded-lg mb-4 space-y-3">
               <div className="space-y-1.5">
-                <Label className="text-slate-300 text-xs">Profit Target ($)</Label>
+                <Label className="text-slate-300 text-xs">Profit Target ({currency ?? 'USD'})</Label>
                 <Input
                   type="number"
                   step="0.01"
