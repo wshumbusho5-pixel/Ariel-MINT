@@ -234,6 +234,39 @@ export interface ShareCard {
   created_at: string
 }
 
+// Chat types
+export interface ChatMessage {
+  id: string
+  user_id: string
+  username: string
+  content: string
+  created_at: string
+  deleted_at: string | null
+}
+
+export interface Conversation {
+  id: string
+  user1_id: string
+  user2_id: string
+  last_message_at: string
+  created_at: string
+  // joined
+  other_user?: { username: string; display_name: string | null }
+  last_message?: string
+  unread_count?: number
+}
+
+export interface DirectMessage {
+  id: string
+  conversation_id: string
+  sender_id: string
+  receiver_id: string
+  content: string
+  read_at: string | null
+  created_at: string
+  deleted_at: string | null
+}
+
 // Analytics types
 export interface PLSummary {
   total_pl: number
