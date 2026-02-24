@@ -1,0 +1,37 @@
+{
+  "name": "Ariel MINT",
+  "short_name": "Ariel MINT",
+  "description": "Intelligent betting analytics and bookkeeping platform",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "background_color": "#020817",
+  "theme_color": "#020817",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["finance", "utilities"],
+  "shortcuts": [
+    {
+      "name": "Add Bet",
+      "url": "/bets/new",
+      "description": "Record a new bet"
+    },
+    {
+      "name": "Dashboard",
+      "url": "/dashboard",
+      "description": "View your P&L dashboard"
+    }
+  ]
+}
