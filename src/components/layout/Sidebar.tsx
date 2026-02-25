@@ -18,6 +18,7 @@ import {
   MessageCircle,
   Award,
   CreditCard,
+  Activity,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
@@ -27,6 +28,7 @@ const navItems = [
   { href: '/bets',         label: 'Bets',         icon: BookOpen },
   { href: '/analytics',    label: 'Analytics',    icon: BarChart3 },
   { href: '/analytics/projections', label: 'Projections', icon: TrendingUp },
+  { href: '/analytics/performance', label: 'Performance', icon: Activity },
   { href: '/risk',         label: 'Risk Alerts',  icon: ShieldAlert },
   { href: '/withdrawals',  label: 'Withdrawals',  icon: Banknote },
   { href: '/chat',              label: 'Group Chat',   icon: MessageSquare },

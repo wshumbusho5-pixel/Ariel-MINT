@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { formatCurrency, formatPct } from '@/lib/utils/currency'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { TrendingUp } from 'lucide-react'
+import { TrendingUp, Activity } from 'lucide-react'
 import { BreakdownChart } from '@/components/analytics/BreakdownChart'
 
 export default async function AnalyticsPage() {
@@ -53,12 +53,20 @@ export default async function AnalyticsPage() {
           <h1 className="text-2xl font-bold text-white">Analytics</h1>
           <p className="text-slate-400 text-sm mt-0.5">Breakdown of your betting performance</p>
         </div>
-        <Link href="/analytics/projections">
-          <Button variant="outline" size="sm" className="border-slate-700 text-slate-300 hover:bg-slate-800">
-            <TrendingUp className="w-4 h-4 mr-2" />
-            Projections
-          </Button>
-        </Link>
+        <div className="flex gap-2">
+          <Link href="/analytics/performance">
+            <Button variant="outline" size="sm" className="border-slate-700 text-slate-300 hover:bg-slate-800">
+              <Activity className="w-4 h-4 mr-2" />
+              Performance
+            </Button>
+          </Link>
+          <Link href="/analytics/projections">
+            <Button variant="outline" size="sm" className="border-slate-700 text-slate-300 hover:bg-slate-800">
+              <TrendingUp className="w-4 h-4 mr-2" />
+              Projections
+            </Button>
+          </Link>
+        </div>
       </div>
 
       <div className="grid lg:grid-cols-2 gap-6">

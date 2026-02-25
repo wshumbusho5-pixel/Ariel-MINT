@@ -19,6 +19,7 @@ import {
   MessageSquare,
   MessageCircle,
   Award,
+  Activity,
 } from 'lucide-react'
 
 const mainNav = [
@@ -31,6 +32,7 @@ const mainNav = [
 const moreNav = [
   { href: '/analytics',             label: 'Analytics',    icon: BarChart3 },
   { href: '/analytics/projections', label: 'Projections',  icon: TrendingUp },
+  { href: '/analytics/performance', label: 'Performance',  icon: Activity },
   { href: '/risk',                  label: 'Risk Alerts',  icon: ShieldAlert },
   { href: '/rankings',              label: 'Rankings',     icon: Trophy },
   { href: '/leaderboard',           label: 'Leaderboard',  icon: Users },
