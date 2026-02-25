@@ -9,6 +9,7 @@ import { RecentBets } from '@/components/dashboard/RecentBets'
 import { RiskAlertBanner } from '@/components/risk/RiskAlertBanner'
 import { RealtimeBankroll } from '@/components/dashboard/RealtimeBankroll'
 import { RiskScoreGauge } from '@/components/risk/RiskScoreGauge'
+import { OnboardingChecklist } from '@/components/dashboard/OnboardingChecklist'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -19,7 +20,7 @@ export default async function DashboardPage() {
   const [profileRes, snapshotsRes, pendingRes, recentRes, alertsRes] = await Promise.all([
     supabase
       .from('profiles')
-      .select('current_bankroll, starting_bankroll, peak_bankroll, tier, tier_points, currency')
+      .select('current_bankroll, starting_bankroll, peak_bankroll, tier, tier_points, currency, onboarding_done, is_public')
       .eq('id', user.id)
       .single(),
     supabase
@@ -53,6 +54,29 @@ export default async function DashboardPage() {
       .order('created_at', { ascending: false })
       .limit(3),
   ])
+
+  // Onboarding checklist data (skip if already dismissed)
+  let onboarding = { hasFirstBet: false, hasSettledBet: false, hasVerifiedBet: false, hasRiskAlert: false }
+  if (!profileRes.data?.onboarding_done) {
+    const [firstBetRes, settledRes, verifiedRes, anyAlertRes] = await Promise.all([
+      supabase.from('bets').select('id', { count: 'exact', head: true })
+        .eq('user_id', user.id).is('deleted_at', null).limit(1),
+      supabase.from('bets').select('id', { count: 'exact', head: true })
+        .eq('user_id', user.id).is('deleted_at', null)
+        .in('status', ['won', 'lost', 'cashout', 'partial_cashout']).limit(1),
+      supabase.from('bets').select('id', { count: 'exact', head: true })
+        .eq('user_id', user.id).is('deleted_at', null)
+        .not('ocr_source_url', 'is', null).limit(1),
+      supabase.from('risk_alerts').select('id', { count: 'exact', head: true })
+        .eq('user_id', user.id).limit(1),
+    ])
+    onboarding = {
+      hasFirstBet: (firstBetRes.count ?? 0) > 0,
+      hasSettledBet: (settledRes.count ?? 0) > 0,
+      hasVerifiedBet: (verifiedRes.count ?? 0) > 0,
+      hasRiskAlert: (anyAlertRes.count ?? 0) > 0,
+    }
+  }
 
   // Calculate summary stats from recent bets (last 30 days)
   const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
@@ -108,6 +132,18 @@ export default async function DashboardPage() {
       {/* Risk alert banners */}
       {activeAlerts.length > 0 && (
         <RiskAlertBanner alerts={activeAlerts} />
+      )}
+
+      {/* Onboarding checklist (hidden once dismissed or all done + dismissed) */}
+      {!profile?.onboarding_done && (
+        <OnboardingChecklist
+          userId={user.id}
+          hasFirstBet={onboarding.hasFirstBet}
+          hasSettledBet={onboarding.hasSettledBet}
+          hasVerifiedBet={onboarding.hasVerifiedBet}
+          hasRiskAlert={onboarding.hasRiskAlert}
+          isPublic={profile?.is_public ?? false}
+        />
       )}
 
       {/* Realtime bankroll — updates live via Supabase subscription */}
