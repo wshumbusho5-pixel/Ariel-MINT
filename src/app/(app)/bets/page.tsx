@@ -29,7 +29,7 @@ export default async function BetsPage({
 
   let query = supabase
     .from('bets')
-    .select('id, sport, event_name, selection, odds, stake, potential_payout, profit_loss, status, placed_at, bookmaker, bet_type, tags', { count: 'exact' })
+    .select('id, sport, event_name, selection, odds, stake, potential_payout, profit_loss, status, placed_at, bookmaker, bet_type, tags, ocr_source_url', { count: 'exact' })
     .eq('user_id', user.id)
     .is('deleted_at', null)
     .order('placed_at', { ascending: false })

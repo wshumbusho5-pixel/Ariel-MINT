@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/select'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { formatCurrency } from '@/lib/utils/currency'
-import { CheckCircle, Trash2, ArrowLeft, Edit } from 'lucide-react'
+import { CheckCircle, Trash2, ArrowLeft, Edit, ShieldCheck, ShieldOff } from 'lucide-react'
 import Link from 'next/link'
 import type { Bet } from '@/types/database'
 
@@ -134,6 +134,20 @@ export function BetDetailView({ bet }: { bet: Bet }) {
                 <p className="text-white font-medium">{item.value}</p>
               </div>
             ))}
+            <div>
+              <p className="text-xs text-slate-500">Verification</p>
+              {bet.ocr_source_url ? (
+                <div className="flex items-center gap-1 text-emerald-400 font-medium text-sm">
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                  Slip verified
+                </div>
+              ) : (
+                <div className="flex items-center gap-1 text-slate-400 font-medium text-sm">
+                  <ShieldOff className="w-3.5 h-3.5" />
+                  Manual entry
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Notes */}

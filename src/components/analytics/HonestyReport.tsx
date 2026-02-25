@@ -175,6 +175,11 @@ export function HonestyReport({ metrics, currency }: { metrics: HonestyMetrics; 
               sub={`${metrics.last14DayBets} bets`}
               positive={metrics.last14DayROI >= 0}
             />
+            <StatRow
+              label="Verified slips"
+              value={`${metrics.verifiedPct}%`}
+              sub={`${metrics.verifiedCount} of ${metrics.sampleSize} bets`}
+            />
           </CardContent>
         </Card>
       </div>

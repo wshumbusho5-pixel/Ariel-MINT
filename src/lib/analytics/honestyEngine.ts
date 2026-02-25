@@ -19,6 +19,7 @@ export interface BetForHonesty {
   status: string        // 'won' | 'lost' | 'cashout' | 'partial_cashout' | 'void'
   profit_loss: number | null
   placed_at: string
+  ocr_source_url?: string | null
 }
 
 export interface MonthlyPL {
@@ -66,6 +67,10 @@ export interface HonestyMetrics {
   // Streak context
   currentStreak: number         // positive = win streak, negative = loss streak
   currentStreakProbability: number  // probability of this streak by chance (0-1)
+
+  // Verification
+  verifiedCount: number         // bets with OCR slip
+  verifiedPct: number           // verified / total * 100
 }
 
 export function computeHonesty(bets: BetForHonesty[]): HonestyMetrics {
@@ -188,6 +193,10 @@ export function computeHonesty(bets: BetForHonesty[]): HonestyMetrics {
       }
     })
 
+  // Verification
+  const verifiedCount = bets.filter(b => b.ocr_source_url).length
+  const verifiedPct = bets.length > 0 ? Math.round(verifiedCount / bets.length * 1000) / 10 : 0
+
   return {
     actualWinRate: Math.round(actualWinRate * 10000) / 100,
     expectedWinRate: Math.round(expectedWinRate * 10000) / 100,
@@ -209,5 +218,7 @@ export function computeHonesty(bets: BetForHonesty[]): HonestyMetrics {
     monthlyPL,
     currentStreak: streakCount,
     currentStreakProbability: Math.round(streakProbability * 10000) / 10000,
+    verifiedCount,
+    verifiedPct,
   }
 }

@@ -8,7 +8,7 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { formatCurrency } from '@/lib/utils/currency'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, ShieldCheck } from 'lucide-react'
 
 interface Bet {
   id: string
@@ -24,6 +24,7 @@ interface Bet {
   bookmaker: string
   bet_type: string
   tags: string[]
+  ocr_source_url: string | null
 }
 
 const STATUS_BADGE: Record<string, string> = {
@@ -93,7 +94,14 @@ export function BetTable({
               >
                 <TableCell>
                   <div>
-                    <p className="text-sm font-medium text-white">{bet.selection}</p>
+                    <div className="flex items-center gap-1.5">
+                      <p className="text-sm font-medium text-white">{bet.selection}</p>
+                      {bet.ocr_source_url && (
+                        <span title="Slip verified">
+                          <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
+                        </span>
+                      )}
+                    </div>
                     <p className="text-xs text-slate-400 truncate max-w-[180px]">{bet.event_name}</p>
                     <Badge variant="outline" className="text-[10px] mt-0.5 text-slate-500 border-slate-700 py-0">
                       {bet.sport}

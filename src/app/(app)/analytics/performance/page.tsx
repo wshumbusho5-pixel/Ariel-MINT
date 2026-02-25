@@ -18,7 +18,7 @@ export default async function PerformancePage() {
 
   const { data: bets } = await supabase
     .from('bets')
-    .select('odds, stake, status, profit_loss, placed_at')
+    .select('odds, stake, status, profit_loss, placed_at, ocr_source_url')
     .eq('user_id', user.id)
     .is('deleted_at', null)
     .order('placed_at', { ascending: true })

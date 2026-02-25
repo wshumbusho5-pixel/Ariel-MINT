@@ -26,11 +26,18 @@ export default async function PublicProfilePage({
   const ninetyDaysAgo = new Date(Date.now() - 90 * 86400000).toISOString()
   const { data: bets } = await supabase
     .from('bets')
-    .select('profit_loss, stake, status, sport')
+    .select('profit_loss, stake, status, sport, ocr_source_url')
     .eq('user_id', profile.id)
     .is('deleted_at', null)
     .in('status', ['won', 'lost', 'cashout', 'partial_cashout'])
     .gte('placed_at', ninetyDaysAgo)
+
+  // All-time verified %
+  const { data: allBets } = await supabase
+    .from('bets')
+    .select('ocr_source_url')
+    .eq('user_id', profile.id)
+    .is('deleted_at', null)
 
   const settled = bets ?? []
   const won = settled.filter(b => b.status === 'won').length
@@ -45,6 +52,10 @@ export default async function PublicProfilePage({
     if (b.sport) sportCounts[b.sport] = (sportCounts[b.sport] ?? 0) + 1
   }
   const topSport = Object.entries(sportCounts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? null
+
+  const all = allBets ?? []
+  const verifiedCount = all.filter(b => b.ocr_source_url).length
+  const verifiedPct = all.length > 0 ? Math.round(verifiedCount / all.length * 1000) / 10 : 0
 
   const memberSince = new Date(profile.created_at).toLocaleDateString(undefined, { month: 'long', year: 'numeric' })
   const advisorSince = profile.advisor_since
@@ -79,7 +90,7 @@ export default async function PublicProfilePage({
         <Card className="bg-slate-900 border-slate-800">
           <CardContent className="p-5">
             <p className="text-xs text-slate-500 uppercase tracking-wide mb-4">Last 90 Days</p>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-center mb-4">
               <div>
                 <p className={`text-xl font-bold ${roi >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
                   {roi >= 0 ? '+' : ''}{roi.toFixed(1)}%
@@ -92,11 +103,17 @@ export default async function PublicProfilePage({
               </div>
               <div>
                 <p className="text-xl font-bold text-white">{settled.length}</p>
-                <p className="text-xs text-slate-500 mt-0.5">Bets</p>
+                <p className="text-xs text-slate-500 mt-0.5">Bets (90d)</p>
               </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4 text-center pt-4 border-t border-slate-800">
               <div>
                 <p className="text-xl font-bold text-white capitalize">{topSport ?? '—'}</p>
                 <p className="text-xs text-slate-500 mt-0.5">Top Sport</p>
+              </div>
+              <div>
+                <p className="text-xl font-bold text-emerald-400">{verifiedPct}%</p>
+                <p className="text-xs text-slate-500 mt-0.5">Slip Verified</p>
               </div>
             </div>
           </CardContent>

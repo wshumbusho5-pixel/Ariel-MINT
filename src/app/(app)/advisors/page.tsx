@@ -24,11 +24,18 @@ export default async function AdvisorsPage() {
     (advisors ?? []).map(async (advisor) => {
       const { data: bets } = await supabase
         .from('bets')
-        .select('profit_loss, stake, status')
+        .select('profit_loss, stake, status, ocr_source_url')
         .eq('user_id', advisor.id)
         .is('deleted_at', null)
         .in('status', ['won', 'lost', 'cashout', 'partial_cashout'])
         .gte('placed_at', ninetyDaysAgo)
+
+      // All-time verified % (separate query)
+      const { data: allBets } = await supabase
+        .from('bets')
+        .select('ocr_source_url')
+        .eq('user_id', advisor.id)
+        .is('deleted_at', null)
 
       const settled = bets ?? []
       const won = settled.filter(b => b.status === 'won').length
@@ -37,11 +44,16 @@ export default async function AdvisorsPage() {
       const roi = totalStake > 0 ? (totalPL / totalStake) * 100 : 0
       const winRate = settled.length > 0 ? (won / settled.length) * 100 : 0
 
+      const all = allBets ?? []
+      const verifiedCount = all.filter(b => b.ocr_source_url).length
+      const verifiedPct = all.length > 0 ? Math.round(verifiedCount / all.length * 1000) / 10 : 0
+
       return {
         ...advisor,
         roi90: Math.round(roi * 10) / 10,
         winRate90: Math.round(winRate * 10) / 10,
         betCount90: settled.length,
+        verifiedPct,
       }
     })
   )
@@ -105,6 +117,9 @@ export default async function AdvisorsPage() {
                         </span>
                         <span className="text-slate-400">
                           Bets: {advisor.betCount90}
+                        </span>
+                        <span className="text-emerald-400/80">
+                          {advisor.verifiedPct}% verified
                         </span>
                       </div>
 
