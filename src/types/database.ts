@@ -17,6 +17,10 @@ export type AlertType =
   | 'monthly_trend_degradation'
   | 'ev_variance_mismatch'
 
+export type SubscriptionStatus = 'trial' | 'active' | 'canceled' | 'past_due'
+export type SubscriptionTier = 'none' | 'regular' | 'advisor'
+export type AdvisorStatus = 'none' | 'active' | 'flagged' | 'suspended'
+
 export interface Profile {
   id: string
   username: string
@@ -31,6 +35,20 @@ export interface Profile {
   tier_points: number
   is_public: boolean
   onboarding_done: boolean
+  // Subscription
+  subscription_status: SubscriptionStatus
+  subscription_tier: SubscriptionTier
+  stripe_customer_id: string | null
+  stripe_subscription_id: string | null
+  sub_period_end: string | null
+  trial_started_at: string
+  // Advisor
+  advisor_status: AdvisorStatus
+  advisor_specialty: string | null
+  advisor_fee: string | null
+  advisor_since: string | null
+  advisor_flagged_at: string | null
+  advisor_flag_reason: string | null
   created_at: string
   updated_at: string
 }

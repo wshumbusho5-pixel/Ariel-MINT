@@ -14,12 +14,28 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('username, onboarding_done')
+    .select('username, onboarding_done, subscription_status, trial_started_at')
     .eq('id', user.id)
     .single()
 
   if (!profile?.onboarding_done && !profile?.username) {
     redirect('/onboarding')
+  }
+
+  // Subscription gate: check trial validity or active subscription
+  const subStatus = profile?.subscription_status ?? 'trial'
+  if (subStatus === 'trial') {
+    const { count: betCount } = await supabase
+      .from('bets')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', user.id)
+      .is('deleted_at', null)
+    const trialStarted = profile?.trial_started_at ? new Date(profile.trial_started_at) : new Date()
+    const trialDays = Math.floor((Date.now() - trialStarted.getTime()) / 86400000)
+    const trialValid = (betCount ?? 0) < 30 && trialDays < 14
+    if (!trialValid) redirect('/upgrade')
+  } else if (subStatus === 'canceled' || subStatus === 'past_due') {
+    redirect('/upgrade')
   }
 
   return (

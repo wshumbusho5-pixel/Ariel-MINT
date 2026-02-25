@@ -18,6 +18,7 @@ import {
   X,
   MessageSquare,
   MessageCircle,
+  Award,
 } from 'lucide-react'
 
 const mainNav = [
@@ -35,6 +36,7 @@ const moreNav = [
   { href: '/leaderboard',           label: 'Leaderboard',  icon: Users },
   { href: '/chat',                  label: 'Group Chat',   icon: MessageSquare },
   { href: '/messages',              label: 'Messages',     icon: MessageCircle },
+  { href: '/advisors',              label: 'Advisors',     icon: Award },
 ]
 
 export function MobileNav() {

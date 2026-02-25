@@ -16,6 +16,8 @@ import {
   LogOut,
   MessageSquare,
   MessageCircle,
+  Award,
+  CreditCard,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
@@ -27,11 +29,13 @@ const navItems = [
   { href: '/analytics/projections', label: 'Projections', icon: TrendingUp },
   { href: '/risk',         label: 'Risk Alerts',  icon: ShieldAlert },
   { href: '/withdrawals',  label: 'Withdrawals',  icon: Banknote },
-  { href: '/chat',         label: 'Group Chat',   icon: MessageSquare },
-  { href: '/messages',     label: 'Messages',     icon: MessageCircle },
-  { href: '/rankings',     label: 'Rankings',     icon: Trophy },
-  { href: '/leaderboard',  label: 'Leaderboard',  icon: Users },
-  { href: '/settings',     label: 'Settings',     icon: Settings },
+  { href: '/chat',              label: 'Group Chat',   icon: MessageSquare },
+  { href: '/messages',          label: 'Messages',     icon: MessageCircle },
+  { href: '/rankings',          label: 'Rankings',     icon: Trophy },
+  { href: '/leaderboard',       label: 'Leaderboard',  icon: Users },
+  { href: '/advisors',          label: 'Advisors',     icon: Award },
+  { href: '/settings/billing',  label: 'Billing',      icon: CreditCard },
+  { href: '/settings',          label: 'Settings',     icon: Settings },
 ]
 
 export function Sidebar() {

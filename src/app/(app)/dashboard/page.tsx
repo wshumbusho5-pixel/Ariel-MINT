@@ -8,6 +8,7 @@ import { PendingBetsPanel } from '@/components/dashboard/PendingBetsPanel'
 import { RecentBets } from '@/components/dashboard/RecentBets'
 import { RiskAlertBanner } from '@/components/risk/RiskAlertBanner'
 import { RealtimeBankroll } from '@/components/dashboard/RealtimeBankroll'
+import { RiskScoreGauge } from '@/components/risk/RiskScoreGauge'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -69,6 +70,16 @@ export default async function DashboardPage() {
   const recentBets = recentRes.data ?? []
   const activeAlerts = alertsRes.data ?? []
   const bets30 = last30Bets ?? []
+
+  // Health score
+  const { data: allAlerts } = await supabase
+    .from('risk_alerts')
+    .select('severity')
+    .eq('user_id', user.id)
+    .is('dismissed_at', null)
+  const criticalCount = (allAlerts ?? []).filter(a => a.severity === 'critical').length
+  const warningCount = (allAlerts ?? []).filter(a => a.severity === 'warning').length
+  const healthScore = Math.max(0, 100 - criticalCount * 25 - warningCount * 10)
 
   const totalPL = bets30.reduce((s, b) => s + (b.profit_loss ?? 0), 0)
   const totalStake = bets30.reduce((s, b) => s + b.stake, 0)
@@ -136,6 +147,9 @@ export default async function DashboardPage() {
           description={`${won30}/${settled30} settled`}
         />
       </div>
+
+      {/* Health score */}
+      <RiskScoreGauge score={healthScore} criticalCount={criticalCount} warningCount={warningCount} />
 
       {/* Bankroll chart */}
       <BankrollChart snapshots={snapshots} currentBankroll={profile?.current_bankroll ?? 0} currency={profile?.currency} />
