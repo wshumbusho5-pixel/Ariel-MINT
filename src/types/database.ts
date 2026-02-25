@@ -49,6 +49,7 @@ export interface Profile {
   advisor_since: string | null
   advisor_flagged_at: string | null
   advisor_flag_reason: string | null
+  weekly_digest: boolean
   created_at: string
   updated_at: string
 }

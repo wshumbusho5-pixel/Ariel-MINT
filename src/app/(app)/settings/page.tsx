@@ -3,7 +3,8 @@ import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { SettingsForm } from '@/components/shared/SettingsForm'
 import { AdvisorSection } from '@/components/settings/AdvisorSection'
-import { CreditCard, FileText, Award } from 'lucide-react'
+import { DigestToggle } from '@/components/settings/DigestToggle'
+import { CreditCard, FileText, Award, Mail } from 'lucide-react'
 
 export default async function SettingsPage() {
   const supabase = await createClient()
@@ -64,6 +65,22 @@ export default async function SettingsPage() {
       </div>
 
       <SettingsForm profile={profile} settings={settingsRes.data} />
+
+      {/* Email Digest */}
+      <Card className="bg-slate-900 border-slate-800">
+        <CardHeader>
+          <CardTitle className="text-white flex items-center gap-2">
+            <Mail className="w-5 h-5" />
+            Email Notifications
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <DigestToggle
+            enabled={profile?.weekly_digest ?? true}
+            userId={user.id}
+          />
+        </CardContent>
+      </Card>
 
       {/* Billing */}
       <Card className="bg-slate-900 border-slate-800">

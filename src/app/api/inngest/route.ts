@@ -7,6 +7,7 @@ import { dailyBankrollSnapshot } from '@/lib/inngest/functions/dailyBankrollSnap
 import { monthlyLeaderboard } from '@/lib/inngest/functions/monthlyLeaderboard'
 import { checkWithdrawalTargets } from '@/lib/inngest/functions/checkWithdrawalTargets'
 import { checkAdvisorStatus } from '@/lib/inngest/functions/checkAdvisorStatus'
+import { weeklyDigest } from '@/lib/inngest/functions/weeklyDigest'
 
 export const { GET, POST, PUT } = serve({
   client: inngest,
@@ -18,6 +19,7 @@ export const { GET, POST, PUT } = serve({
     monthlyLeaderboard,
     checkWithdrawalTargets,
     checkAdvisorStatus,
+    weeklyDigest,
   ],
   signingKey: process.env.INNGEST_SIGNING_KEY,
 })
