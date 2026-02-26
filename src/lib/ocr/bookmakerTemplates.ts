@@ -17,6 +17,10 @@ export interface BookmakerTemplate {
   }
 }
 
+// Matches African currency amounts with commas: "700,000" or "700000"
+const AFRICAN_STAKE = /(?:PLACE\s+BET|stake|bet\s+amount|wager)[:\s]+(?:UGX|KES|NGN|GHS|ZMW|TZS|ZAR|RWF|ETB|XOF)?\s*(\d[\d,]*(?:\.\d{1,2})?)/i
+const CURRENCY_AMOUNT = /(?:UGX|KES|NGN|GHS|ZMW|TZS|ZAR|RWF|ETB|XOF)\s*(\d[\d,]*(?:\.\d{1,2})?)/i
+
 export const BOOKMAKER_TEMPLATES: BookmakerTemplate[] = [
   {
     name: 'Bet365',
@@ -58,8 +62,81 @@ export const BOOKMAKER_TEMPLATES: BookmakerTemplate[] = [
     name: 'Betway',
     identifiers: ['betway'],
     patterns: {
-      odds: [/(?:odds)[:\s]+(\d+\.?\d*)/i, /@ (\d+\.\d+)/],
-      stake: [/(?:stake)[:\s]+(?:\$|£|€)?(\d+\.?\d*)/i],
+      odds: [
+        /(?:odds)[:\s]+(\d+\.?\d*)/i,
+        /@ (\d+\.\d+)/,
+        // Standalone decimal odds (1.01 – 50.00)
+        /\b([1-9]\d{0,1}\.\d{2})\b/,
+      ],
+      stake: [
+        // "PLACE BET UGX 700000" or "PLACE BET UGX 700,000"
+        /PLACE\s+BET\s+(?:UGX|KES|NGN|GHS|ZMW|TZS|ZAR|RWF|XOF)?\s*(\d[\d,]*(?:\.\d{1,2})?)/i,
+        AFRICAN_STAKE,
+        CURRENCY_AMOUNT,
+        /(?:stake|bet)[:\s]+(?:\$|£|€)?(\d[\d,]*(?:\.\d{1,2})?)/i,
+      ],
+      market: [
+        /(1X2(?:\s+Full\s+Time)?)/i,
+        /(Full\s+Time\s+Result)/i,
+        /(Both\s+Teams?\s+to\s+Score)/i,
+        /(Over\s+\d+\.?\d*\s+Goals?)/i,
+        /(Under\s+\d+\.?\d*\s+Goals?)/i,
+        /(Double\s+Chance)/i,
+        /(Draw\s+No\s+Bet)/i,
+        /(Asian\s+Handicap)/i,
+      ],
+      betReference: [/(?:bet|ref|ticket|slip)[:\s#]+([A-Z0-9-]{4,20})/i],
+    },
+  },
+  {
+    name: 'SportyBet',
+    identifiers: ['sportybet', 'sporty bet'],
+    patterns: {
+      odds: [/\b([1-9]\d{0,1}\.\d{2})\b/, /odds[:\s]+(\d+\.?\d*)/i],
+      stake: [
+        AFRICAN_STAKE,
+        CURRENCY_AMOUNT,
+        /(?:stake|bet)[:\s]+(?:\$|£|€)?(\d[\d,]*(?:\.\d{1,2})?)/i,
+      ],
+      betReference: [/(?:bet|ref|id|ticket)[:\s#]+([A-Z0-9-]{4,20})/i],
+    },
+  },
+  {
+    name: '1xBet',
+    identifiers: ['1xbet', '1x bet', '1xбет'],
+    patterns: {
+      odds: [/(?:coeff|odds|коэф)[:\s.]+(\d+\.?\d*)/i, /\b([1-9]\d{0,1}\.\d{2})\b/],
+      stake: [
+        AFRICAN_STAKE,
+        CURRENCY_AMOUNT,
+        /(?:stake|bet amount|bet)[:\s]+(?:\$|£|€)?(\d[\d,]*(?:\.\d{1,2})?)/i,
+      ],
+      betReference: [/(?:bet|order|id)[:\s#]+(\d{6,15})/i],
+    },
+  },
+  {
+    name: 'BetPawa',
+    identifiers: ['betpawa', 'bet pawa'],
+    patterns: {
+      odds: [/\b([1-9]\d{0,1}\.\d{2})\b/, /odds[:\s]+(\d+\.?\d*)/i],
+      stake: [AFRICAN_STAKE, CURRENCY_AMOUNT],
+      betReference: [/(?:bet|id|ref)[:\s#]+([A-Z0-9-]{4,20})/i],
+    },
+  },
+  {
+    name: 'Odibets',
+    identifiers: ['odibets', 'odi bets', 'odibets.com'],
+    patterns: {
+      odds: [/\b([1-9]\d{0,1}\.\d{2})\b/, /odds[:\s]+(\d+\.?\d*)/i],
+      stake: [AFRICAN_STAKE, CURRENCY_AMOUNT],
+    },
+  },
+  {
+    name: 'Betin',
+    identifiers: ['betin', 'betin.co'],
+    patterns: {
+      odds: [/\b([1-9]\d{0,1}\.\d{2})\b/, /odds[:\s]+(\d+\.?\d*)/i],
+      stake: [AFRICAN_STAKE, CURRENCY_AMOUNT],
     },
   },
   {

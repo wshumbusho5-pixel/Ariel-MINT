@@ -36,7 +36,10 @@ export function OcrUploader() {
         body: formData,
       })
 
-      if (!response.ok) throw new Error('Upload failed')
+      if (!response.ok) {
+        const body = await response.json().catch(() => ({}))
+        throw new Error(body.error ?? 'Upload failed')
+      }
 
       const { jobId: id } = await response.json()
       setJobId(id)
@@ -65,12 +68,14 @@ export function OcrUploader() {
         } else if (job?.status === 'failed' || job?.status === 'rejected') {
           clearInterval(poll)
           setStatus('error')
-          toast.error('Could not parse this slip. Try adding the bet manually.')
+          const msg = job.error_message ?? 'Could not parse this slip. Try adding the bet manually.'
+          toast.error(msg)
         }
       }, 2000)
-    } catch {
+    } catch (err) {
       setStatus('error')
-      toast.error('Upload failed. Please try again.')
+      const msg = err instanceof Error ? err.message : 'Upload failed. Please try again.'
+      toast.error(msg)
     }
   }
 
