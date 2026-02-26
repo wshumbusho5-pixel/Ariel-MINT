@@ -50,8 +50,16 @@ export interface Profile {
   advisor_flagged_at: string | null
   advisor_flag_reason: string | null
   weekly_digest: boolean
+  country: string | null
   created_at: string
   updated_at: string
+}
+
+export interface Follow {
+  id: string
+  follower_id: string
+  following_id: string
+  created_at: string
 }
 
 export interface UserSettings {

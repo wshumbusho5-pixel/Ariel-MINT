@@ -5,8 +5,10 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { ArrowLeft, Send } from 'lucide-react'
+import { ArrowLeft, Send, Lock, UserPlus } from 'lucide-react'
 import type { DirectMessage, Conversation } from '@/types/database'
+
+const MESSAGE_LIMIT = 5
 
 function timeAgo(dateStr: string) {
   const diff = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000)
@@ -16,18 +18,37 @@ function timeAgo(dateStr: string) {
   return new Date(dateStr).toLocaleDateString()
 }
 
-export function DMThread({ conversation, initialMessages, currentUserId }: {
+export function DMThread({
+  conversation,
+  initialMessages,
+  currentUserId,
+  isMutual,
+  otherAlias,
+  otherId,
+  initialMessageCount,
+}: {
   conversation: Conversation
   initialMessages: DirectMessage[]
   currentUserId: string
+  isMutual: boolean
+  otherAlias: string
+  otherId: string
+  initialMessageCount: number
 }) {
   const [messages, setMessages] = useState<DirectMessage[]>(initialMessages)
+  const [msgCount, setMsgCount] = useState(initialMessageCount)
   const [input, setInput] = useState('')
   const [sending, setSending] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
   const supabase = createClient()
 
   const other = conversation.other_user
+  const limitReached = !isMutual && msgCount >= MESSAGE_LIMIT
+  const remaining = Math.max(0, MESSAGE_LIMIT - msgCount)
+
+  // Display name: real username if mutual, alias otherwise
+  const displayName = isMutual ? (other?.display_name ?? other?.username ?? otherAlias) : otherAlias
+  const displaySub = isMutual ? `@${other?.username}` : 'Anonymous · follow each other to reveal identity'
 
   // Mark as read on mount
   useEffect(() => {
@@ -49,7 +70,7 @@ export function DMThread({ conversation, initialMessages, currentUserId }: {
       }, (payload) => {
         const msg = payload.new as DirectMessage
         setMessages(prev => [...prev, msg])
-        // Mark new incoming messages as read
+        setMsgCount(prev => prev + 1)
         if (msg.receiver_id === currentUserId) {
           fetch(`/api/messages/${conversation.id}/read`, { method: 'PATCH' })
         }
@@ -61,55 +82,70 @@ export function DMThread({ conversation, initialMessages, currentUserId }: {
 
   async function send() {
     const text = input.trim()
-    if (!text || sending) return
+    if (!text || sending || limitReached) return
     setSending(true)
     setInput('')
 
-    // Optimistic
+    const optimisticId = crypto.randomUUID()
     const optimistic: DirectMessage = {
-      id: crypto.randomUUID(),
+      id: optimisticId,
       conversation_id: conversation.id,
       sender_id: currentUserId,
-      receiver_id: conversation.user1_id === currentUserId ? conversation.user2_id : conversation.user1_id,
+      receiver_id: otherId,
       content: text,
       read_at: null,
       created_at: new Date().toISOString(),
       deleted_at: null,
     }
     setMessages(prev => [...prev, optimistic])
+    setMsgCount(prev => prev + 1)
 
-    await fetch(`/api/messages/${conversation.id}`, {
+    const res = await fetch(`/api/messages/${conversation.id}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ content: text }),
     })
+
+    if (!res.ok) {
+      // Roll back optimistic
+      setMessages(prev => prev.filter(m => m.id !== optimisticId))
+      setMsgCount(prev => Math.max(0, prev - 1))
+      setInput(text)
+    }
     setSending(false)
   }
 
   return (
     <div className="flex flex-col h-[calc(100vh-160px)] min-h-0">
       {/* Header */}
-      <div className="flex items-center gap-3 pb-3 border-b border-slate-800 mb-0">
+      <div className="flex items-center gap-3 pb-3 border-b border-slate-800">
         <Link href="/messages">
           <Button variant="ghost" size="sm" className="text-slate-400 hover:text-white p-1">
             <ArrowLeft className="w-5 h-5" />
           </Button>
         </Link>
         <div className="w-9 h-9 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 font-semibold text-sm flex-shrink-0">
-          {(other?.username ?? '?')[0].toUpperCase()}
+          {displayName[0].toUpperCase()}
         </div>
-        <div>
-          <p className="text-sm font-semibold text-white">{other?.display_name ?? other?.username}</p>
-          <p className="text-xs text-slate-400">@{other?.username}</p>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-semibold text-white truncate">{displayName}</p>
+          <p className="text-xs text-slate-400 truncate">{displaySub}</p>
         </div>
+        {!isMutual && !limitReached && (
+          <span className="text-xs text-slate-500 flex-shrink-0">{remaining} msg{remaining !== 1 ? 's' : ''} left</span>
+        )}
       </div>
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto space-y-3 p-4">
-        {messages.length === 0 && (
-          <p className="text-center text-slate-500 text-sm py-12">
-            No messages yet. Say something!
-          </p>
+        {!isMutual && messages.length === 0 && (
+          <div className="text-center py-8">
+            <p className="text-slate-400 text-sm">You have {MESSAGE_LIMIT} anonymous messages.</p>
+            <p className="text-slate-500 text-xs mt-1">Follow each other to chat freely and reveal identities.</p>
+          </div>
+        )}
+        {isMutual && messages.length === 0 && (
+          <p className="text-center text-slate-500 text-sm py-12">No messages yet. Say something!</p>
         )}
         {messages.map((msg) => {
           const isOwn = msg.sender_id === currentUserId
@@ -132,25 +168,45 @@ export function DMThread({ conversation, initialMessages, currentUserId }: {
         <div ref={bottomRef} />
       </div>
 
+      {/* Limit reached banner */}
+      {limitReached && (
+        <div className="border-t border-amber-500/20 bg-amber-500/5 p-4 text-center">
+          <Lock className="w-5 h-5 text-amber-400 mx-auto mb-2" />
+          <p className="text-sm font-medium text-amber-400">Message limit reached</p>
+          <p className="text-xs text-slate-400 mt-1 mb-3">
+            Follow each other to continue chatting and reveal your identities
+          </p>
+          <Link
+            href="/community"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-semibold text-sm transition-colors"
+          >
+            <UserPlus className="w-4 h-4" />
+            Go to Community to Follow
+          </Link>
+        </div>
+      )}
+
       {/* Input */}
-      <div className="border-t border-slate-800 p-3 flex gap-2">
-        <Input
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && send()}
-          placeholder={`Message ${other?.username ?? ''}...`}
-          className="bg-slate-800 border-slate-700 text-slate-200 placeholder:text-slate-500"
-          maxLength={1000}
-        />
-        <Button
-          onClick={send}
-          disabled={!input.trim() || sending}
-          className="bg-emerald-500 hover:bg-emerald-600 text-slate-950 flex-shrink-0"
-          size="sm"
-        >
-          <Send className="w-4 h-4" />
-        </Button>
-      </div>
+      {!limitReached && (
+        <div className="border-t border-slate-800 p-3 flex gap-2">
+          <Input
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && send()}
+            placeholder={isMutual ? `Message ${other?.username ?? ''}...` : `Message anonymously (${remaining} left)...`}
+            className="bg-slate-800 border-slate-700 text-slate-200 placeholder:text-slate-500"
+            maxLength={1000}
+          />
+          <Button
+            onClick={send}
+            disabled={!input.trim() || sending}
+            className="bg-emerald-500 hover:bg-emerald-600 text-slate-950 flex-shrink-0"
+            size="sm"
+          >
+            <Send className="w-4 h-4" />
+          </Button>
+        </div>
+      )}
     </div>
   )
 }

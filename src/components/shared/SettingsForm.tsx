@@ -41,6 +41,7 @@ export function SettingsForm({
   const [isPublic, setIsPublic] = useState(profile?.is_public ?? false)
   const [currency, setCurrency] = useState(profile?.currency ?? 'USD')
   const [timezone, setTimezone] = useState(profile?.timezone ?? 'UTC')
+  const [country, setCountry] = useState(profile?.country ?? '')
 
   async function saveProfile(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -54,6 +55,7 @@ export function SettingsForm({
         timezone,
         currency,
         is_public: isPublic,
+        country: country.trim() || null,
       })
       .eq('id', profile?.id ?? '')
 
@@ -116,6 +118,16 @@ export function SettingsForm({
                 defaultValue={profile?.display_name ?? ''}
                 className="bg-slate-800 border-slate-700 text-slate-200"
               />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-slate-300 text-xs">Country</Label>
+              <Input
+                value={country}
+                onChange={e => setCountry(e.target.value)}
+                placeholder="e.g. Zimbabwe, United Kingdom..."
+                className="bg-slate-800 border-slate-700 text-slate-200 placeholder:text-slate-500"
+              />
+              <p className="text-xs text-slate-500">Used to show bettors near you in the Community page</p>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">

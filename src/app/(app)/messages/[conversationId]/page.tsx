@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import { DMThread } from '@/components/chat/DMThread'
+import { userAlias } from '@/lib/utils/alias'
 import type { Conversation } from '@/types/database'
 
 export default async function DMThreadPage({
@@ -37,15 +38,20 @@ export default async function DMThreadPage({
 
   // Load other user's profile
   const otherId = conv.user1_id === user.id ? conv.user2_id : conv.user1_id
-  const { data: otherProfile } = await supabase
-    .from('profiles')
-    .select('username, display_name')
-    .eq('id', otherId)
-    .single()
+
+  const [profileRes, iFollowRes, theyFollowRes] = await Promise.all([
+    supabase.from('profiles').select('username, display_name').eq('id', otherId).single(),
+    supabase.from('follows').select('id').eq('follower_id', user.id).eq('following_id', otherId).maybeSingle(),
+    supabase.from('follows').select('id').eq('follower_id', otherId).eq('following_id', user.id).maybeSingle(),
+  ])
+
+  const isMutual = !!iFollowRes.data && !!theyFollowRes.data
+  const alias = userAlias(otherId)
+  const messageCount = messagesRes.data?.length ?? 0
 
   const conversation: Conversation = {
     ...conv,
-    other_user: otherProfile ?? undefined,
+    other_user: profileRes.data ?? undefined,
   }
 
   return (
@@ -54,6 +60,10 @@ export default async function DMThreadPage({
         conversation={conversation}
         initialMessages={messagesRes.data ?? []}
         currentUserId={user.id}
+        isMutual={isMutual}
+        otherAlias={alias}
+        otherId={otherId}
+        initialMessageCount={messageCount}
       />
     </div>
   )

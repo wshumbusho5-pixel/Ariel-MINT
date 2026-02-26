@@ -26,6 +26,7 @@ import { useRouter } from 'next/navigation'
 const navItems = [
   { href: '/dashboard',    label: 'Dashboard',    icon: LayoutDashboard },
   { href: '/bets',         label: 'Bets',         icon: BookOpen },
+  { href: '/community',    label: 'Community',    icon: Users },
   { href: '/analytics',    label: 'Analytics',    icon: BarChart3 },
   { href: '/analytics/projections', label: 'Projections', icon: TrendingUp },
   { href: '/analytics/performance', label: 'Performance', icon: Activity },

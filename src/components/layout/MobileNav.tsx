@@ -30,6 +30,7 @@ const mainNav = [
 ]
 
 const moreNav = [
+  { href: '/community',             label: 'Community',    icon: Users },
   { href: '/analytics',             label: 'Analytics',    icon: BarChart3 },
   { href: '/analytics/projections', label: 'Projections',  icon: TrendingUp },
   { href: '/analytics/performance', label: 'Performance',  icon: Activity },
