@@ -134,6 +134,15 @@ export function OcrUploader() {
                   if (file) handleFile(file)
                 }}
               />
+              <div className="mt-6 pt-5 border-t border-slate-800 w-full text-left">
+                <p className="text-xs font-semibold text-slate-400 mb-2">Tips for best results:</p>
+                <ul className="text-xs text-slate-500 space-y-1">
+                  <li>• Take a full screenshot of the bet confirmation screen</li>
+                  <li>• Make sure the odds, stake, and selection are clearly visible</li>
+                  <li>• Higher resolution images parse more accurately</li>
+                  <li>• Works with Betway, Bet365, SportyBet, 1xBet, DraftKings, and more</li>
+                </ul>
+              </div>
             </>
           )}
 
@@ -193,18 +202,6 @@ export function OcrUploader() {
         </div>
       )}
 
-      {/* Tips */}
-      <Card className="bg-slate-900/50 border-slate-800">
-        <CardContent className="p-4">
-          <p className="text-xs font-semibold text-slate-400 mb-2">Tips for best results:</p>
-          <ul className="text-xs text-slate-500 space-y-1">
-            <li>• Take a full screenshot of the bet confirmation screen</li>
-            <li>• Make sure the odds, stake, and selection are clearly visible</li>
-            <li>• Higher resolution images parse more accurately</li>
-            <li>• Works with Bet365, DraftKings, FanDuel, William Hill, Betway, and more</li>
-          </ul>
-        </CardContent>
-      </Card>
     </div>
   )
 }
